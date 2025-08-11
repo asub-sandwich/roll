@@ -17,7 +17,7 @@
 #endif
 
 /* ---------- Utils ---------- */
-static const unsigned DICE_TYPES[] = {4, 6, 8, 10, 12, 20, 100};
+static const unsigned DICE_TYPES[] = {2, 4, 6, 8, 10, 12, 20, 100};
 static const size_t   DICE_TYPES_LEN = sizeof(DICE_TYPES)/sizeof(DICE_TYPES[0]);
 static void print_help(void) {
   fprintf(stderr,
@@ -27,7 +27,7 @@ static void print_help(void) {
   "     roll d20\n"
   "     roll 5d6 + 4\n"
   "     roll 2d8 + d10 - 2\n\n"
-  "Allowed Dice: d4 d6 d8 d10 d12 d20 d100\n\n"
+  "Allowed Dice: d2 d4 d6 d8 d10 d12 d20 d100\n\n"
   );
 }
 
