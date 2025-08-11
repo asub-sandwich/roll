@@ -351,8 +351,9 @@ int main(int argc, char** argv) {
   for (int i=1; i<argc; i++) {
     if (strcmp(argv[i], "--no-color")==0) {
       force_no_color = true;
+      continue;
     }
-
+    
     if (tlen==tcap) {
       size_t ncap = tcap? tcap*2 : 16;
       Token* nt = (Token*)realloc(tokens, ncap*sizeof(Token));
