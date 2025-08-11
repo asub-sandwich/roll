@@ -364,6 +364,7 @@ int main(int argc, char** argv) {
       strcmp(argv[i], "--quiet") == 0
     ) {
         quiet = true;
+        force_no_color = true;
         continue;
       }
     
