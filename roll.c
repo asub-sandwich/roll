@@ -21,9 +21,10 @@ static const unsigned DICE_TYPES[] = {2, 4, 6, 8, 10, 12, 20, 100};
 static const size_t   DICE_TYPES_LEN = sizeof(DICE_TYPES)/sizeof(DICE_TYPES[0]);
 static void print_help(void) {
   fprintf(stderr,
-  "\nUsage:\n"
-  "     roll <cound>d<die> [+|- <count>d<die> | <constant>]... [--no-color]\n\n"
-    "Examples:\n"
+"\nUsage:\n"
+  "     roll <cound>d<die> [+|- <count>d<die> | <constant>]...\n"
+  "          [--no-color | -n] [--quiet | -q]\n\n"
+  "Examples:\n"
   "     roll d20\n"
   "     roll 5d6 + 4\n"
   "     roll 2d8 + d10 - 2\n\n"
@@ -343,16 +344,28 @@ int main(int argc, char** argv) {
   }
 
   bool force_no_color = false;
+  bool quiet = false;
 
   // Collect tokens
   Token* tokens = NULL;
   size_t tlen = 0, tcap = 0;
 
   for (int i=1; i<argc; i++) {
-    if (strcmp(argv[i], "--no-color")==0) {
+    if (
+      strcmp(argv[i], "--no-color") == 0 ||
+      strcmp(argv[i], "-n") == 0)
+    {
       force_no_color = true;
       continue;
     }
+
+    if (
+      strcmp(argv[i], "-q") == 0 ||
+      strcmp(argv[i], "--quiet") == 0
+    ) {
+        quiet = true;
+        continue;
+      }
     
     if (tlen==tcap) {
       size_t ncap = tcap? tcap*2 : 16;
@@ -414,10 +427,13 @@ int main(int argc, char** argv) {
   }
   maybe_collect_special(&tokens[0], &rr, &specials);
   total += rr.sum;
-  format_operand(&tokens[0], &rr, stdout);
-  fputs(" = ", stdout);
-  boldu(total, color, stdout);
-  fputc('\n', stdout);
+
+  if (!quiet) {
+    format_operand(&tokens[0], &rr, stdout);
+    fputs(" = ", stdout);
+    boldu(total, color, stdout);
+    fputc('\n', stdout);
+  }
   uv_free(&rr.rolls);
 
   // Get pairs of op operand
@@ -450,18 +466,26 @@ int main(int argc, char** argv) {
       return 1;
     }
 
-    format_operand(&rhs, &rr, stdout);
-    fputs(" = ", stdout);
-    boldu(total, color, stdout);
-    fputc('\n', stdout);
+    if (!quiet) {
+      format_operand(&rhs, &rr, stdout);
+      fputs(" = ", stdout);
+      boldu(total, color, stdout);
+      fputc('\n', stdout);
+    }
     uv_free(&rr.rolls);
   }
-  
-  fputs("Total: ", stdout);
-  boldu(total, color, stdout);
-  fputc('\n', stdout);
 
-  for (size_t i=0; i<specials.len; i++) {
-    format_special(specials.data[i], color, stdout);
+  if (!quiet) {
+    fputs("Total: ", stdout);
+    boldu(total, color, stdout);
+    fputc('\n', stdout);
+
+    for (size_t i=0; i<specials.len; i++) {
+      format_special(specials.data[i], color, stdout);
+    }
+  } else {
+    fprintf(stdout, "%u\n", total);
+    fflush(stdout);
   }
+  return 0;
 }

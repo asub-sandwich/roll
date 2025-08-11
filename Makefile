@@ -1,25 +1,22 @@
 # Makefile for roll (C dice roller)
 
-# ---- config (override from CLI as needed) ----
-CC               ?= cc
-TARGET           ?= roll
-SRC              ?= roll.c
+# ---- config ----
+CC       ?= cc
+TARGET   ?= bin/roll
+SRC      ?= roll.c
 
-# Install locations (standard defaults)
-PREFIX           ?= /usr/local
-BINDIR           ?= $(PREFIX)/bin
+# Install locations
+PREFIX   ?= /usr/local
+BINDIR   ?= $(PREFIX)/bin
 
-# Tools
-INSTALL          ?= install
-STRIP            ?= strip
+INSTALL  ?= install
+STRIP    ?= strip
 
 # Flags
 WARNFLAGS        := -Wall -Wextra -Wpedantic
 CSTD             := -std=c99
-
 CFLAGS_RELEASE   := $(CSTD) $(WARNFLAGS) -O3 -flto -DNDEBUG
 LDFLAGS_RELEASE  := -flto -s
-
 CFLAGS_DEBUG     := $(CSTD) $(WARNFLAGS) -O0 -g3
 LDFLAGS_DEBUG    :=
 
@@ -30,21 +27,22 @@ all: release
 
 release: $(TARGET)
 
+# Ensure bin directory exists before building
 $(TARGET): $(SRC)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS_RELEASE) -o $@ $^ $(LDFLAGS_RELEASE)
 
 debug:
-	$(CC) $(CFLAGS_DEBUG) -o $(TARGET)-debug $(SRC) $(LDFLAGS_DEBUG)
+	@mkdir -p $(dir $(TARGET))
+	$(CC) $(CFLAGS_DEBUG) -o $(dir $(TARGET))roll-debug $(SRC) $(LDFLAGS_DEBUG)
 
 clean:
-	rm -f $(TARGET) $(TARGET)-debug
+	rm -f $(TARGET) $(dir $(TARGET))roll-debug
 
-# Install the optimized build. Honors DESTDIR and PREFIX.
 install: release
 	$(INSTALL) -d "$(DESTDIR)$(BINDIR)"
-	$(INSTALL) -m 0755 "$(TARGET)" "$(DESTDIR)$(BINDIR)/$(TARGET)"
-	# Optional: extra strip (harmless if already -s linked)
-	-$(STRIP) "$(DESTDIR)$(BINDIR)/$(TARGET)"
+	$(INSTALL) -m 0755 "$(TARGET)" "$(DESTDIR)$(BINDIR)/roll"
+	-$(STRIP) "$(DESTDIR)$(BINDIR)/roll"
 
 uninstall:
-	rm -f "$(DESTDIR)$(BINDIR)/$(TARGET)"
+	rm -f "$(DESTDIR)$(BINDIR)/roll"
