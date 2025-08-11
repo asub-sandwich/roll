@@ -21,3 +21,11 @@ allowed dice: d2 d4 d6 d8 d10 d12 d20 d100
 # install
     make
     sudo make install
+
+# probability testing
+    make test
+    
+    TRIALS=100 make test
+    DICE_TYPES="4 12" make test
+
+Default: 10,000 trials; all dice
