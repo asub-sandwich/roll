@@ -452,12 +452,16 @@ int main(int argc, char** argv) {
     maybe_collect_special(&rhs, &rr, &specials);
 
     if (op.type == T_PLUS) {
-      green("+", color, stdout);
-      fputc(' ', stdout);
+      if (!quiet) {
+        green("+", color, stdout);
+        fputc(' ', stdout);
+      }
       total += rr.sum;
     } else if (op.type == T_MINUS) {
-      red("-", color, stdout);
-      fputc(' ', stdout);
+      if (!quiet) {
+        red("-", color, stdout);
+        fputc(' ', stdout);
+      }
       total = (rr.sum > total) ? 0u : total - rr.sum;
     } else {
       fprintf(stderr, "Error: expected operator!\n");
